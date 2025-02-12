@@ -1,14 +1,6 @@
 trigger:
 - main
 
-resources:
-  repositories:
-    - repository: self
-    - repository: githubRepo
-      type: github
-      endpoint: 'Your-GitHub-Service-Connection'
-      name: 'mai-efat/PHP'
-      ref: main  # Change if needed
 
 variables:
   tag: '$(Build.BuildId)'
