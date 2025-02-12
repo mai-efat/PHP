@@ -4,6 +4,14 @@ trigger:
 
 variables:
   tag: '$(Build.BuildId)'
+resources:
+  repositories:
+    - repository: self
+    - repository: githubRepo
+      type: github
+      endpoint: 'mai-efat'
+      name: 'mai-efat/PHP'
+      ref: main  # Change if needed
 
 stages:
 - stage: Build
