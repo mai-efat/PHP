@@ -9,7 +9,7 @@ resources:
     - repository: self
     - repository: githubRepo
       type: github
-      endpoint: 'mai-effat'  # ✅ Update this
+      endpoint: 'mai-efat'  # ✅ Update this
       name: 'mai-efat/PHP'
       ref: main
 
