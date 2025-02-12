@@ -1,29 +1,32 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
 - main
 
 resources:
-- repo: self
+  repositories:
+    - repository: self
+    - repository: githubRepo
+      type: github
+      endpoint: 'Your-GitHub-Service-Connection'
+      name: 'mai-efat/PHP'
+      ref: main  # Change if needed
 
 variables:
   tag: '$(Build.BuildId)'
 
 stages:
 - stage: Build
-  displayName: Build image
+  displayName: Build Docker Image
   jobs:
   - job: Build
     displayName: Build
     pool:
       vmImage: ubuntu-latest
     steps:
+    - checkout: self  # Ensures pipeline checks out the correct repo
     - task: Docker@2
       displayName: Build an image
       inputs:
         command: build
-        dockerfile: '$(Build.SourcesDirectory)/product/Dockerfile'
+        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         tags: |
           $(tag)
