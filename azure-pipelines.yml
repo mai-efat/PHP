@@ -22,16 +22,23 @@ stages:
     pool:
       vmImage: ubuntu-latest
     steps:
-    - checkout: self  # ✅ Ensure it checks out the repo
-      persistCredentials: true
-    - script: echo "Pipeline is running correctly!"  # ✅ Debugging step
-      displayName: "Debugging Step"
-    - script: ls -l $(Build.SourcesDirectory)  # ✅ Debugging step to check files
-      displayName: "List Source Directory"
+    - checkout: self
     - task: Docker@2
       displayName: Build an image
       inputs:
         command: build
-        dockerfile: '$(Build.SourcesDirectory)/product/Dockerfile'  # ✅ Update if needed
+        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         tags: |
           $(tag)
+
+- stage: Deploy
+  displayName: Deploy Application
+  dependsOn: Build  # Ensures this stage runs AFTER Build
+  jobs:
+  - job: Deploy
+    displayName: Deploy Job
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - script: echo "Deploying application..."
+
