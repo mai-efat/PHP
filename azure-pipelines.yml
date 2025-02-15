@@ -3,15 +3,15 @@ trigger:
 
 variables:
   tag: '$(Build.BuildId)'
-  dockerRegistryServiceConnection: 'docker'    # Docker Hub service connection
-  imageName: 'maieffat/php'                    # Docker Hub image
+  dockerRegistryServiceConnection: 'docker'
+  imageName: 'maieffat/php'
 
 resources:
   repositories:
     - repository: self
     - repository: githubRepo
       type: github
-      endpoint: 'mai-efat'  
+      endpoint: 'mai-efat'
       name: 'mai-efat/PHP'
       ref: main
 
@@ -26,29 +26,28 @@ stages:
       steps:
         - checkout: self
 
-        # Docker Build
         - task: Docker@2
           displayName: Build Docker Image
           inputs:
             command: build
             Dockerfile: '$(Build.SourcesDirectory)/product/Dockerfile'
             repository: $(imageName)
-            tags: |
-              $(tag)
+            tags: $(tag)
 
-        # Save Docker Image as TAR (in Artifact Staging Directory)
         - script: |
             mkdir -p $(Build.ArtifactStagingDirectory)
-            docker save -o $(Build.ArtifactStagingDirectory)/docker-image.tar $(imageName):$(tag)
+            docker save -o $(Build.ArtifactStagingDirectory)/docker-image.tar $(imageName):$(tag) || {
+              echo "❌ Docker image save failed." > /home/vsts/work/_temp/task_outputs/build_1739631147052.txt
+              exit 1
+            }
           displayName: Save Docker Image as TAR
 
-        # Publish Docker Image as Artifact
         - task: PublishPipelineArtifact@1
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)/docker-image.tar'
             artifactName: 'docker-image'
           displayName: Publish Docker Image Artifact
 
-        # Confirmation Message
-        - script: echo "✅ Docker image $(imageName):$(tag) saved to artifacts"
+        - script: |
+            echo "✅ Docker image $(imageName):$(tag) saved to artifacts" > /home/vsts/work/_temp/task_outputs/build_1739631147052.txt
           displayName: Confirm Artifact Upload
