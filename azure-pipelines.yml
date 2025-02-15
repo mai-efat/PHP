@@ -25,12 +25,12 @@ stages:
     steps:
     - checkout: self
 
-    # Docker Login
-    - task: Docker@2
-      displayName: Login to Docker Hub
-      inputs:
-        command: login
-        containerRegistry: $(dockerRegistryServiceConnection)
+    # # Docker Login
+    # - task: Docker@2
+    #   displayName: Login to Docker Hub
+    #   inputs:
+    #     command: login
+    #     containerRegistry: $(dockerRegistryServiceConnection)
 
     # Docker Build
     - task: Docker@2
@@ -43,21 +43,33 @@ stages:
           $(tag)
           
 
-    # Docker Push
-    - task: Docker@2
-      displayName: Push Docker Image
-      inputs:
-        command: push
-        containerRegistry: $(dockerRegistryServiceConnection)
-        repository: $(imageName)
-        tags: |
-          $(tag)
+    # # Docker Push
+    # - task: Docker@2
+    #   displayName: Push Docker Image
+    #   inputs:
+    #     command: push
+    #     containerRegistry: $(dockerRegistryServiceConnection)
+    #     repository: $(imageName)
+    #     tags: |
+    #       $(tag)
 
-    - script: |
-        docker run -d -p 8080:80 --name php-app $(imageName):$(tag)
-        sleep 10
-        curl http://localhost:8080
-      displayName: Test Docker Container
+    # - script: |
+    #     docker run -d -p 8080:80 --name php-app $(imageName):$(tag)
+    #     sleep 10
+    #     curl http://localhost:8080
+    #   displayName: Test Docker Container
+
+ - script: |
+        docker save -o php_app_$(tag).tar $(imageName):$(tag)
+      displayName: Save Docker Image as TAR
+
+    # Publish Docker Image as Artifact
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: 'php_app_$(tag).tar'
+        artifactName: 'docker-images'
+      displayName: Publish Docker Image to Artifacts
+    
           
 
     - script: echo "✅ Docker image $(imageName):$(tag) pushed to Docker Hub"
