@@ -47,6 +47,11 @@ stages:
             targetPath: 'php_app_$(tag).tar'
             artifactName: 'docker-images'
           displayName: Publish Docker Image to Artifacts
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)/docker-image.tar'
+            artifactName: 'docker-image'
+          displayName: Publish Docker Image Artifact
 
         # Confirmation Message
         - script: echo "✅ Docker image $(imageName):$(tag) saved to artifacts"
