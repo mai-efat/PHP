@@ -41,7 +41,7 @@ stages:
         repository: $(imageName)
         tags: |
           $(tag)
-          latest
+          
 
     # Docker Push
     - task: Docker@2
@@ -52,7 +52,7 @@ stages:
         repository: $(imageName)
         tags: |
           $(tag)
-          latest
+          
 
     - script: echo "✅ Docker image $(imageName):$(tag) pushed to Docker Hub"
       displayName: Confirm Push
