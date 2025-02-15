@@ -29,6 +29,8 @@ stages:
         # Build the package
         - script: |
             cd product
+            chmod +x product/api.py
+
             python api.py sdist bdist_wheel
           displayName: Build Python package
 
