@@ -28,7 +28,7 @@ stages:
 
         # Build the package
         - script: |
-            python setup.py sdist bdist_wheel
+            python api.py sdist bdist_wheel
           displayName: Build Python package
 
         # Publish to Azure Artifacts
