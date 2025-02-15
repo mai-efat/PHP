@@ -1,6 +1,5 @@
 trigger:
 - main
-
 variables:
   tag: '$(Build.BuildId)'
   dockerRegistryServiceConnection: 'docker'    # Docker Hub service connection
