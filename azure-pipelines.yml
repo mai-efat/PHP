@@ -28,6 +28,7 @@ stages:
 
         # Build the package
         - script: |
+            cd product
             python api.py sdist bdist_wheel
           displayName: Build Python package
 
