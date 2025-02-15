@@ -1,5 +1,6 @@
 trigger:
 - main
+
 variables:
   tag: '$(Build.BuildId)'
   dockerRegistryServiceConnection: 'docker'    # Docker Hub service connection
@@ -18,59 +19,35 @@ stages:
 - stage: BuildAndPush
   displayName: Build and Push Docker Image
   jobs:
-  - job: Build
-    displayName: Build Docker Image
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - checkout: self
-
-    # # Docker Login
-    # - task: Docker@2
-    #   displayName: Login to Docker Hub
-    #   inputs:
-    #     command: login
-    #     containerRegistry: $(dockerRegistryServiceConnection)
-
-    # Docker Build
-    - task: Docker@2
+    - job: Build
       displayName: Build Docker Image
-      inputs:
-        command: build
-        Dockerfile: '$(Build.SourcesDirectory)/product/Dockerfile'
-        repository: $(imageName)
-        tags: |
-          $(tag)
-          
+      pool:
+        vmImage: ubuntu-latest
+      steps:
+        - checkout: self
 
-    # # Docker Push
-    # - task: Docker@2
-    #   displayName: Push Docker Image
-    #   inputs:
-    #     command: push
-    #     containerRegistry: $(dockerRegistryServiceConnection)
-    #     repository: $(imageName)
-    #     tags: |
-    #       $(tag)
+        # Docker Build
+        - task: Docker@2
+          displayName: Build Docker Image
+          inputs:
+            command: build
+            Dockerfile: '$(Build.SourcesDirectory)/product/Dockerfile'
+            repository: $(imageName)
+            tags: |
+              $(tag)
 
-    # - script: |
-    #     docker run -d -p 8080:80 --name php-app $(imageName):$(tag)
-    #     sleep 10
-    #     curl http://localhost:8080
-    #   displayName: Test Docker Container
+        # Save Docker Image as TAR
+        - script: |
+            docker save -o php_app_$(tag).tar $(imageName):$(tag)
+          displayName: Save Docker Image as TAR
 
- - script: |
-        docker save -o php_app_$(tag).tar $(imageName):$(tag)
-      displayName: Save Docker Image as TAR
+        # Publish Docker Image as Artifact
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: 'php_app_$(tag).tar'
+            artifactName: 'docker-images'
+          displayName: Publish Docker Image to Artifacts
 
-    # Publish Docker Image as Artifact
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: 'php_app_$(tag).tar'
-        artifactName: 'docker-images'
-      displayName: Publish Docker Image to Artifacts
-    
-          
-
-    - script: echo "✅ Docker image $(imageName):$(tag) pushed to Docker Hub"
-      displayName: Confirm Push
+        # Confirmation Message
+        - script: echo "✅ Docker image $(imageName):$(tag) saved to artifacts"
+          displayName: Confirm Artifact Upload
