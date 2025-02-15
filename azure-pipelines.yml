@@ -29,7 +29,7 @@ stages:
         # Build the package
         - script: |
             cd product
-            chmod +x api.py
+             sudo chmod +x api.py
 
             python api.py sdist bdist_wheel
           displayName: Build Python package
