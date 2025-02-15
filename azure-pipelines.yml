@@ -31,14 +31,31 @@ stages:
         tags: |
           $(tag)
 
-- stage: Deploy
-  displayName: Deploy Application
-  dependsOn: Build  # Ensures this stage runs AFTER Build
-  jobs:
-  - job: Deploy
-    displayName: Deploy Job
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - script: echo "Deploying application..."
+ - task: Docker@2
+      displayName: Login to Docker Hub
+      inputs:
+        command: login
+        containerRegistry: $(dockerRegistryServiceConnection)
+
+    - task: Docker@2
+      displayName: Build Docker Image
+      inputs:
+        command: build
+        Dockerfile: '$(Build.SourcesDirectory)/product/Dockerfile'  # Adjust path if needed
+        tags: |
+          $(imageName):$(tag)
+          $(imageName):$(Build.BuildId)
+
+    - task: Docker@2
+      displayName: Push Docker Image
+      inputs:
+        command: push
+        containerRegistry: $(dockerRegistryServiceConnection)
+        repository: $(imageName)
+        tags: |
+          $(tag)
+          $(Build.BuildId)
+
+    - script: echo "✅ Docker image pushed to Docker Hub"
+      displayName: Confirm Push
 
