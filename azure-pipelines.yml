@@ -1,4 +1,9 @@
 trigger:
+- task: DownloadBuildArtifacts@1
+  inputs:
+    buildType: 'current'
+    downloadType: 'single'
+    downloadPath: '$(System.ArtifactsDirectory)'
 - main
 
 variables:
