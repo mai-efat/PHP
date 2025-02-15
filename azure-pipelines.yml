@@ -36,17 +36,13 @@ stages:
             tags: |
               $(tag)
 
-        # Save Docker Image as TAR
+        # Save Docker Image as TAR (in Artifact Staging Directory)
         - script: |
-            docker save -o php_app_$(tag).tar $(imageName):$(tag)
+            mkdir -p $(Build.ArtifactStagingDirectory)
+            docker save -o $(Build.ArtifactStagingDirectory)/docker-image.tar $(imageName):$(tag)
           displayName: Save Docker Image as TAR
 
         # Publish Docker Image as Artifact
-        - task: PublishPipelineArtifact@1
-          inputs:
-            targetPath: 'php_app_$(tag).tar'
-            artifactName: 'docker-images'
-          displayName: Publish Docker Image to Artifacts
         - task: PublishPipelineArtifact@1
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)/docker-image.tar'
