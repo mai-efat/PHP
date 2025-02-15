@@ -52,6 +52,12 @@ stages:
         repository: $(imageName)
         tags: |
           $(tag)
+
+    - script: |
+        docker run -d -p 8080:80 --name php-app $(imageName):$(tag)
+        sleep 10
+        curl http://localhost:8080
+      displayName: Test Docker Container
           
 
     - script: echo "✅ Docker image $(imageName):$(tag) pushed to Docker Hub"
